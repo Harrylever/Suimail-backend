@@ -92,7 +92,14 @@ export class MailService {
       const payload = `${encryptedBody}!!!${Date.now()}`;
 
       const walrusBlob = await sendToWalrus(payload);
-      const blobId = walrusBlob.newlyCreated.blobObject.blobId;
+      const payloadBlobId =
+        walrusBlob?.newlyCreated?.blobObject.blobId ?? walrusBlob?.alreadyCertified?.blobId;
+
+      if (!payloadBlobId) {
+        throw new InternalServerError('Failed to upload mail', {
+          error: 'No blobId found',
+        });
+      }
 
       const attachments: {
         blobId: string;
@@ -111,8 +118,18 @@ export class MailService {
       await Promise.all(
         attachmentPayload.map(async attachment => {
           const walrusBlob = await sendToWalrus(attachment.buffer);
+
+          const attachmentBlobId =
+            walrusBlob?.newlyCreated?.blobObject.blobId ?? walrusBlob?.alreadyCertified?.blobId;
+
+          if (!attachmentBlobId) {
+            throw new InternalServerError('Failed to upload attachment', {
+              error: 'No blobId found',
+            });
+          }
+
           attachments.push({
-            blobId: walrusBlob.newlyCreated.blobObject.blobId,
+            blobId: attachmentBlobId,
             fileName: attachment.fileName,
             fileType: attachment.fileType,
           });
@@ -120,7 +137,7 @@ export class MailService {
       );
 
       await this.create({
-        blobId,
+        blobId: payloadBlobId,
         subject,
         senderId,
         recipientId,
@@ -320,10 +337,12 @@ export class MailService {
       const attachments = await Promise.all(
         mail.attachments.map(async attachment => {
           const attachmentPayload = await getFromWalrus(attachment.blobId);
+          const buffer = Buffer.from(attachmentPayload.message.data);
+
           return {
             fileName: attachment.fileName,
             fileType: attachment.fileType,
-            content: attachmentPayload.message,
+            content: buffer.toString('base64'),
           };
         }),
       );
