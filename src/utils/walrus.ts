@@ -1,7 +1,20 @@
 import axios from 'axios';
 import { InternalServerError } from './AppError';
 
-const sendToWalrus = async (payload: string | Buffer | Buffer<ArrayBufferLike>) => {
+interface BlobObject {
+  blobId: string;
+}
+
+interface WalrusResponse {
+  newlyCreated?: {
+    blobObject: BlobObject;
+  };
+  alreadyCertified?: BlobObject;
+}
+
+const sendToWalrus = async (
+  payload: string | Buffer | Buffer<ArrayBufferLike>,
+): Promise<WalrusResponse | null> => {
   try {
     const uploadToWalrus = await axios.put(
       'https://walrus.testnet.publisher.stakepool.dev.br/v1/blobs?epochs=50',
@@ -23,7 +36,7 @@ const sendToWalrus = async (payload: string | Buffer | Buffer<ArrayBufferLike>) 
   }
 };
 
-const getFromWalrus = async (blobId: string) => {
+const getFromWalrus = async (blobId: string): Promise<any> => {
   try {
     const fetchFromWalrus = await axios.get(
       `https://wal-aggregator-testnet.staketab.org/v1/blobs/${blobId}`,

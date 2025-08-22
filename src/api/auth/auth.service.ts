@@ -23,7 +23,7 @@ export class AuthService {
     return await this.generateToken(newUser.id);
   }
 
-  private async generateToken(id: string) {
+  private async generateToken(id: string): Promise<string> {
     const tokenVersion = await this.userService.incrementAuthTokenVersion(id);
 
     const payload: Pick<JWTPayload, 'sub' | 'version'> = {

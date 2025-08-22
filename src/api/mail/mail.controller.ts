@@ -1,6 +1,12 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { MailListResponseDto, MailResponseDto } from './schemas/mail-response.dto';
 import { MailService } from './mail.service';
+import { BadRequestError } from '../../utils/AppError';
+import {
+  validateAttachmentCount,
+  validateAttachmentSize,
+  validateTotalAttachmentSize,
+} from '../../utils/helpers';
 
 export class MailController {
   private mailService: MailService;
@@ -17,6 +23,19 @@ export class MailController {
     try {
       const { recipient, subject, body, digest } = req.body;
       const files = req.files as Express.Multer.File[];
+
+      if (!validateAttachmentCount(files)) {
+        throw new BadRequestError('Attachments cannot exceed limit of 5 files');
+      }
+
+      if (!validateAttachmentSize(files)) {
+        throw new BadRequestError('Attachment size exceeds 300KB');
+      }
+
+      if (!validateTotalAttachmentSize(files)) {
+        throw new BadRequestError('Total attachment size exceeds 10MB');
+      }
+
       const from = req.user!.id;
 
       await this.mailService.sendMail({
