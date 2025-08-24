@@ -31,3 +31,20 @@ export const validateTotalAttachmentSize = (files: Express.Multer.File[]): boole
   const totalSize = files.reduce((acc, file) => acc + file.size, 0);
   return totalSize <= MAX_ATTACHMENTS_TOTAL_SIZE;
 };
+
+/**
+ * Validates if a string is a valid Suimail address
+ * @param email The email address to validate
+ * @returns boolean indicating if the email is valid
+ */
+export const isValidSuimailNs = (suimailNs: string): boolean => {
+  if (!suimailNs) return false;
+
+  return !!(
+    suimailNs.match(/.*@suimailapp$/) &&
+    suimailNs.split('@')[0].match(/^[a-zA-Z0-9][a-zA-Z0-9.]*[a-zA-Z0-9]$/) &&
+    suimailNs.split('@')[0].length >= 3 &&
+    suimailNs.split('@')[0].length <= 20 &&
+    (suimailNs.match(/@/g) || []).length === 1
+  );
+};

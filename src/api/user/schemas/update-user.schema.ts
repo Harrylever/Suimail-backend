@@ -1,10 +1,16 @@
 import joi from 'joi';
+import { isValidSuimailNs } from '../../../utils/helpers';
 
 export const updateUserSuimailNsSchema = joi.object({
   suimailNs: joi
     .string()
     .min(1)
-    .pattern(/^[a-zA-Z0-9][a-zA-Z0-9.]*[a-zA-Z0-9]@suimail$/)
+    .custom((value, helpers) => {
+      if (!isValidSuimailNs(value)) {
+        return helpers.error('string.invalid');
+      }
+      return value;
+    })
     .custom((value, helpers) => {
       const username = value.split('@')[0];
       if (username.length < 3 || username.length > 20) {
@@ -18,8 +24,7 @@ export const updateUserSuimailNsSchema = joi.object({
     .required()
     .messages({
       'any.required': 'Suimail namespace is required',
-      'string.pattern.base':
-        'Suimail namespace must be a valid format (3-20 alphanumeric characters followed by @suimail)',
+      'string.invalid': 'Suimail namespace must be a valid format',
       'string.length': 'Username must be between 3 and 20 characters',
     }),
 });
