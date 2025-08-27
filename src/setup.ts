@@ -7,7 +7,7 @@ import logger from './config/logger';
 import { CORS_ORIGIN } from './config/envs';
 import { setupSwaggerDocs } from './config/swagger';
 
-export const middlewareSetup = (app: Express) => {
+export const middlewareSetup = (app: Express): void => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 

@@ -29,7 +29,7 @@ const swaggerDocs = swaggerJsDoc({
   ],
 });
 
-export const setupSwaggerDocs = (app: Express) => {
+export const setupSwaggerDocs = (app: Express): void => {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
   console.log(`Swagger docs available at http://localhost:${process.env.PORT}/docs`);
 };

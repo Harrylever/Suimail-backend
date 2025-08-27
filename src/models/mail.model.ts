@@ -1,5 +1,20 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface Attachment {
+  blobId: string;
+  fileName: string;
+  fileType: string;
+}
+
+export interface MailMetadata {
+  sender: {
+    identifier: string;
+  };
+  recipient: {
+    identifier: string;
+  };
+}
+
 export interface IMail extends Document {
   blobId: string;
   digest?: string;
@@ -8,20 +23,9 @@ export interface IMail extends Document {
   recipientId: string;
   body: string;
   starred: boolean;
-  attachments?: {
-    blobId: string;
-    fileName: string;
-    fileType: string;
-  }[];
-  metadata?: {
-    sender: {
-      identifier: string;
-    };
-    recipient: {
-      identifier: string;
-    };
-  };
-
+  attachments?: Attachment[];
+  metadata?: MailMetadata;
+  parentMailId?: string;
   readAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -90,6 +94,12 @@ const MailSchema: Schema = new Schema(
       type: Date,
       required: false,
       description: 'Date and time the mail was read',
+    },
+    parentMailId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Mail',
+      required: false,
+      description: 'ID of the parent mail (if this is a reply)',
     },
     metadata: {
       type: Schema.Types.Mixed,

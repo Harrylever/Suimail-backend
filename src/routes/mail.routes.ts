@@ -6,6 +6,7 @@ import { validateRequest } from '../middlewares/validation/validation.middleware
 
 const mailRouter = express.Router();
 const mailController = new MailController();
+
 /**
  * @swagger
  * /mail/send:
@@ -20,15 +21,26 @@ const mailController = new MailController();
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - recipient
+ *               - subject
+ *               - body
  *             properties:
- *               from:
+ *               recipient:
  *                 type: string
- *               to:
- *                 type: string
+ *                 description: The wallet address of the recipient
  *               subject:
  *                 type: string
+ *                 description: The subject of the mail
  *               body:
  *                 type: string
+ *                 description: The body of the mail
+ *               parentMailId:
+ *                 type: string
+ *                 description: The ID of the parent mail if this is a reply
+ *               digest:
+ *                 type: string
+ *                 description: The transaction digest from the blockchain
  *               attachments:
  *                 type: array
  *                 items:

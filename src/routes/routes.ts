@@ -5,7 +5,7 @@ import authMiddleware from '../middlewares/auth.middleware';
 import userRouter from './user.routes';
 import statsRouter from './stats.routes';
 
-export const routeSetup = (app: Express) => {
+export const routeSetup = (app: Express): void => {
   app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'API is running!' });
   });
