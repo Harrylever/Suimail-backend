@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 import { Request, Response } from 'express';
 
 export const statsRateLimit = rateLimit({
@@ -33,7 +33,7 @@ export const expensiveRateLimit = rateLimit({
   },
 });
 
-export const createUserRateLimit = () => {
+export const createUserRateLimit = (): RateLimitRequestHandler => {
   return rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 3,

@@ -3,6 +3,7 @@ import { getFromWalrus, sendToWalrus } from '../../utils/walrus';
 import { UserService } from '../user/user.service';
 import { decryptData, encryptData } from '../../utils/encryption';
 import { InternalServerError, NotFoundError } from '../../utils/AppError';
+import { CreateMailSchema, SendMailSchema } from './schemas/send-mail.schema';
 
 interface PopulatedUser {
   suimailNs: string;
@@ -31,20 +32,8 @@ export class MailService {
     digest,
     attachments,
     metadata,
-  }: {
-    blobId: string;
-    subject: string;
-    senderId: string;
-    recipientId: string;
-    body: string;
-    digest: string;
-    attachments: {
-      blobId: string;
-      fileName: string;
-      fileType: string;
-    }[];
-    metadata: IMail['metadata'];
-  }) {
+    parentMailId,
+  }: CreateMailSchema): Promise<IMail> {
     return await Mail.create({
       blobId,
       subject,
@@ -54,6 +43,7 @@ export class MailService {
       digest,
       attachments,
       metadata,
+      parentMailId,
     });
   }
 
@@ -64,14 +54,8 @@ export class MailService {
     body,
     files,
     digest,
-  }: {
-    senderId: string;
-    recipient: string;
-    subject: string;
-    body: string;
-    files: Express.Multer.File[];
-    digest: string;
-  }): Promise<void> {
+    parentMailId,
+  }: SendMailSchema): Promise<void> {
     const recipientUser = await this.userService.findBySuimailNs(recipient);
     if (!recipientUser) {
       throw new NotFoundError('Recipient not found', {
@@ -152,6 +136,7 @@ export class MailService {
             identifier: recipientUser.suimailNs,
           },
         },
+        parentMailId,
       });
     } catch (error) {
       throw new InternalServerError('Failed to send mail', {

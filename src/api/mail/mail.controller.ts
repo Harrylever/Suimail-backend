@@ -21,7 +21,7 @@ export class MailController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const { recipient, subject, body, digest } = req.body;
+      const { recipient, subject, body, digest, parentMailId } = req.body;
       const files = req.files as Express.Multer.File[];
 
       if (!validateAttachmentCount(files)) {
@@ -45,6 +45,7 @@ export class MailController {
         body,
         files,
         digest,
+        parentMailId,
       });
       res.status(200).json({ message: 'Mail sent successfully' });
     } catch (error) {
