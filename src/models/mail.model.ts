@@ -96,7 +96,8 @@ const MailSchema: Schema = new Schema(
       description: 'Date and time the mail was read',
     },
     parentMailId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Mail',
       required: false,
       description: 'ID of the parent mail (if this is a reply)',
     },

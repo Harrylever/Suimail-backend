@@ -1,4 +1,5 @@
 import joi from 'joi';
+import { Types } from 'mongoose';
 import { Attachment, IMail } from '../../../models/mail.model';
 
 export interface CreateMailSchema {
@@ -7,8 +8,8 @@ export interface CreateMailSchema {
   senderId: string;
   recipientId: string;
   body: string;
-  digest: string;
-  parentMailId?: string;
+  digest?: string;
+  parentMailId?: Types.ObjectId;
   attachments: Attachment[];
   metadata: IMail['metadata'];
 }
@@ -19,8 +20,8 @@ export interface SendMailSchema {
   subject: string;
   body: string;
   files: Express.Multer.File[];
-  parentMailId?: string;
-  digest: string;
+  parentMailId?: Types.ObjectId;
+  digest?: string;
 }
 
 export const sendMailSchema = joi.object({
